@@ -32,85 +32,111 @@
       <!-- API配置 -->
       <div v-if="activeTab === 'api'" class="api-settings">
         <div class="mb-6">
-          <h2 class="text-lg font-semibold mb-4">GLM4.5 API 配置</h2>
+          <h2 class="text-lg font-semibold mb-4">多模型API配置</h2>
+          <p class="text-sm text-gray-600 mb-6">配置GLM4.5-air、KimiK2、DeepSeek V3.1等AI模型，用于提示词并发优化</p>
           
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                API 密钥
-              </label>
-              <div class="flex space-x-2">
-                <input 
-                  v-model="apiSettings.apiKey" 
-                  :type="showApiKey ? 'text' : 'password'"
-                  placeholder="请输入GLM4.5 API密钥"
-                  class="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <button 
-                  @click="showApiKey = !showApiKey"
-                  class="px-3 py-2 border rounded hover:bg-gray-50"
-                >
-                  <i :class="showApiKey ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-4 h-4"></i>
-                </button>
+          <!-- 模型配置卡片 -->
+          <div class="space-y-6">
+            <div v-for="config in apiConfigs" :key="config.modelName" class="border rounded-lg p-4">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="i-lucide-brain w-4 h-4 text-blue-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-medium">{{ getModelDisplayName(config.modelName) }}</h3>
+                    <p class="text-sm text-gray-500">{{ config.modelName }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span :class="getStatusClass(config.modelName)" class="px-2 py-1 text-xs rounded-full">
+                    {{ getStatusText(config.modelName) }}
+                  </span>
+                  <label class="switch">
+                    <input v-model="config.enabled" type="checkbox" @change="saveConfigs" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              
+              <div v-if="config.enabled" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    API 密钥
+                  </label>
+                  <div class="flex space-x-2">
+                    <input 
+                      v-model="config.apiKey" 
+                      :type="showApiKeys[config.modelName] ? 'text' : 'password'"
+                      :placeholder="`请输入${getModelDisplayName(config.modelName)} API密钥`"
+                      class="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      @blur="saveConfigs"
+                    />
+                    <button 
+                      @click="toggleApiKeyVisibility(config.modelName)"
+                      class="px-3 py-2 border rounded hover:bg-gray-50"
+                    >
+                      <i :class="showApiKeys[config.modelName] ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-4 h-4"></i>
+                    </button>
+                    <button 
+                      @click="testModelConnection(config.modelName)"
+                      :disabled="testingModels[config.modelName] || !config.apiKey"
+                      class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      <i v-if="testingModels[config.modelName]" class="i-lucide-loader-2 w-4 h-4 animate-spin"></i>
+                      <i v-else class="i-lucide-zap w-4 h-4"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      温度参数 ({{ config.temperature }})
+                    </label>
+                    <input 
+                      v-model.number="config.temperature" 
+                      type="range" 
+                      min="0" 
+                      max="1" 
+                      step="0.1"
+                      class="w-full"
+                      @change="saveConfigs"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      超时时间 (秒)
+                    </label>
+                    <input 
+                      v-model.number="config.timeout" 
+                      type="number" 
+                      min="5" 
+                      max="60"
+                      class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      @blur="saveConfigs"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                模型选择
-              </label>
-              <select 
-                v-model="apiSettings.model" 
-                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="glm-4-plus">GLM-4-Plus</option>
-                <option value="glm-4">GLM-4</option>
-                <option value="glm-3-turbo">GLM-3-Turbo</option>
-              </select>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  温度参数 ({{ apiSettings.temperature }})
-                </label>
-                <input 
-                  v-model.number="apiSettings.temperature" 
-                  type="range" 
-                  min="0" 
-                  max="1" 
-                  step="0.1"
-                  class="w-full"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  最大Token数
-                </label>
-                <input 
-                  v-model.number="apiSettings.maxTokens" 
-                  type="number" 
-                  min="100" 
-                  max="4000"
-                  class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-            
-            <div class="flex space-x-2">
-              <button @click="testConnection" :disabled="testing" class="btn-primary">
-                <i class="i-lucide-zap w-4 h-4 mr-2"></i>
-                {{ testing ? '测试中...' : '测试连接' }}
-              </button>
-              <button @click="saveApiSettings" :disabled="saving" class="btn-secondary">
-                <i class="i-lucide-save w-4 h-4 mr-2"></i>
-                {{ saving ? '保存中...' : '保存设置' }}
-              </button>
-            </div>
-            
-            <div v-if="connectionStatus" :class="connectionStatusClass" class="p-3 rounded">
-              {{ connectionStatus }}
-            </div>
+          </div>
+          
+          <!-- 全局操作 -->
+          <div class="mt-6 flex space-x-2">
+            <button @click="testAllConnections" :disabled="testingAll" class="btn-primary">
+              <i v-if="testingAll" class="i-lucide-loader-2 w-4 h-4 mr-2 animate-spin"></i>
+              <i v-else class="i-lucide-zap w-4 h-4 mr-2"></i>
+              {{ testingAll ? '测试中...' : '测试所有连接' }}
+            </button>
+            <button @click="resetToDefaults" class="btn-secondary">
+              <i class="i-lucide-refresh-cw w-4 h-4 mr-2"></i>
+              重置为默认
+            </button>
+          </div>
+          
+          <div v-if="connectionStatus" :class="connectionStatusClass" class="mt-4 p-3 rounded">
+            {{ connectionStatus }}
           </div>
         </div>
       </div>
@@ -233,20 +259,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { invoke } from '@tauri-apps/api/core'
 import { adjustWindowSize, WINDOW_PRESETS } from '../utils/windowManager'
+import { storageService } from '../services/storage'
+import { concurrentOptimizer } from '../services/concurrent-optimizer'
+import { toast } from '../services/toast'
+import type { ApiConfig, ModelName, SystemSettings } from '../types/prompt-optimizer'
+import { MODEL_CONFIGS } from '../types/prompt-optimizer'
 
 const router = useRouter()
 
 // 响应式数据
 const activeTab = ref('api')
-const showApiKey = ref(false)
-const testing = ref(false)
-const saving = ref(false)
 const connectionStatus = ref('')
 const connectionStatusClass = ref('')
+const testingAll = ref(false)
 
 // 标签页配置
 const tabs = [
@@ -255,21 +284,20 @@ const tabs = [
   { key: 'about', label: '关于', icon: 'i-lucide-info' }
 ]
 
-// API设置
-const apiSettings = ref({
-  apiKey: '',
-  model: 'glm-4-plus',
-  temperature: 0.7,
-  maxTokens: 2048
-})
+// API配置
+const apiConfigs = ref<ApiConfig[]>([])
+const showApiKeys = reactive<Record<string, boolean>>({})
+const testingModels = reactive<Record<string, boolean>>({})
+const modelStatuses = reactive<Record<string, 'online' | 'offline' | 'error' | 'unknown'>>({})
+const saving = ref(false)
 
 // 系统设置
-const systemSettings = ref({
+const systemSettings = ref<SystemSettings>({
   autoStart: false,
-  alwaysOnTop: true,
+  alwaysOnTop: false,
   minimizeToTray: true,
   monitoringInterval: 5000,
-  theme: 'light'
+  theme: 'auto'
 })
 
 const buildDate = new Date().toLocaleDateString('zh-CN')
@@ -284,94 +312,145 @@ const goBack = async () => {
   router.push('/')
 }
 
-const loadSettings = async () => {
-  try {
-    // 加载API设置
-    const apiKey = await invoke('get_setting', { key: 'glm_api_key' })
-    if (apiKey) apiSettings.value.apiKey = apiKey as string
-    
-    // 加载系统设置
-    const autoStart = await invoke('get_setting', { key: 'auto_start' })
-    if (autoStart) systemSettings.value.autoStart = autoStart === 'true'
-    
-    const alwaysOnTop = await invoke('get_setting', { key: 'window_always_on_top' })
-    if (alwaysOnTop) systemSettings.value.alwaysOnTop = alwaysOnTop === 'true'
-    
-    const interval = await invoke('get_setting', { key: 'monitoring_interval' })
-    if (interval) systemSettings.value.monitoringInterval = parseInt(interval as string)
-  } catch (error) {
-    console.error('加载设置失败:', error)
+// 获取模型显示名称
+const getModelDisplayName = (modelName: string): string => {
+  return MODEL_CONFIGS[modelName as ModelName]?.displayName || modelName
+}
+
+// 获取模型状态样式类
+const getStatusClass = (modelName: string): string => {
+  const status = modelStatuses[modelName] || 'unknown'
+  switch (status) {
+    case 'online': return 'bg-green-100 text-green-800'
+    case 'offline': return 'bg-red-100 text-red-800'
+    case 'error': return 'bg-red-100 text-red-800'
+    default: return 'bg-gray-100 text-gray-800'
   }
 }
 
-const testConnection = async () => {
-  if (!apiSettings.value.apiKey.trim()) {
-    connectionStatus.value = '请先输入API密钥'
-    connectionStatusClass.value = 'bg-red-100 text-red-800'
+// 获取模型状态文本
+const getStatusText = (modelName: string): string => {
+  const status = modelStatuses[modelName] || 'unknown'
+  switch (status) {
+    case 'online': return '在线'
+    case 'offline': return '离线'
+    case 'error': return '错误'
+    default: return '未知'
+  }
+}
+
+// 切换API密钥可见性
+const toggleApiKeyVisibility = (modelName: string) => {
+  showApiKeys[modelName] = !showApiKeys[modelName]
+}
+
+// 加载API配置
+const loadApiConfigs = () => {
+  apiConfigs.value = storageService.getApiConfigs()
+  // 初始化状态
+  apiConfigs.value.forEach(config => {
+    showApiKeys[config.modelName] = false
+    testingModels[config.modelName] = false
+    modelStatuses[config.modelName] = 'unknown'
+  })
+}
+
+// 保存API配置
+const saveConfigs = () => {
+  try {
+    storageService.saveApiConfigs(apiConfigs.value)
+    toast.saveSuccess('API配置')
+  } catch (error) {
+    console.error('保存配置失败:', error)
+    toast.error('保存失败，请稍后重试')
+  }
+}
+
+// 测试单个模型连接
+const testModelConnection = async (modelName: string) => {
+  const config = apiConfigs.value.find(c => c.modelName === modelName)
+  if (!config || !config.apiKey) {
+    toast.warning('请先配置API密钥')
     return
   }
   
-  testing.value = true
-  connectionStatus.value = ''
+  testingModels[modelName] = true
   
   try {
-    const result = await invoke('initialize_glm_client', { 
-      apiKey: apiSettings.value.apiKey 
-    })
+    const isValid = await concurrentOptimizer.validateApiKey(config)
+    modelStatuses[modelName] = isValid ? 'online' : 'offline'
     
-    if (result) {
-      connectionStatus.value = 'API连接测试成功！'
-      connectionStatusClass.value = 'bg-green-100 text-green-800'
+    if (isValid) {
+      toast.success(`${getModelDisplayName(modelName)} 连接测试成功`)
     } else {
-      connectionStatus.value = 'API连接测试失败，请检查密钥是否正确'
-      connectionStatusClass.value = 'bg-red-100 text-red-800'
+      toast.error(`${getModelDisplayName(modelName)} 连接测试失败，请检查API密钥`)
     }
   } catch (error) {
-    connectionStatus.value = `连接失败: ${error}`
-    connectionStatusClass.value = 'bg-red-100 text-red-800'
+    modelStatuses[modelName] = 'error'
+    console.error(`${modelName} 连接测试失败:`, error)
+    toast.handleApiError(error, `${getModelDisplayName(modelName)} 连接测试`)
   } finally {
-    testing.value = false
+    testingModels[modelName] = false
   }
 }
 
-const saveApiSettings = async () => {
-  saving.value = true
+// 测试所有连接
+const testAllConnections = async () => {
+  const enabledConfigs = apiConfigs.value.filter(c => c.enabled && c.apiKey)
+  if (enabledConfigs.length === 0) {
+    toast.warning('没有可测试的API配置')
+    return
+  }
+  
+  testingAll.value = true
   
   try {
-    await invoke('set_setting', { key: 'glm_api_key', value: apiSettings.value.apiKey })
-    await invoke('set_setting', { key: 'glm_model', value: apiSettings.value.model })
-    await invoke('set_setting', { key: 'glm_temperature', value: apiSettings.value.temperature.toString() })
-    await invoke('set_setting', { key: 'glm_max_tokens', value: apiSettings.value.maxTokens.toString() })
+    const results = await concurrentOptimizer.validateConfigs(enabledConfigs)
+    let successCount = 0
     
-    connectionStatus.value = 'API设置保存成功！'
-    connectionStatusClass.value = 'bg-green-100 text-green-800'
+    Object.entries(results).forEach(([modelName, isValid]) => {
+      modelStatuses[modelName] = isValid ? 'online' : 'offline'
+      if (isValid) successCount++
+    })
+    
+    toast.batchOperation(successCount, enabledConfigs.length, 'API连接测试')
   } catch (error) {
-    connectionStatus.value = `保存失败: ${error}`
-    connectionStatusClass.value = 'bg-red-100 text-red-800'
+    console.error('批量测试失败:', error)
+    toast.error('批量测试失败，请稍后重试')
   } finally {
-    saving.value = false
+    testingAll.value = false
   }
+}
+
+// 重置为默认配置
+const resetToDefaults = () => {
+  toast.deleteConfirm('所有API配置', () => {
+    apiConfigs.value = concurrentOptimizer.getRecommendedConfigs()
+    saveConfigs()
+    toast.success('API配置已重置为默认值')
+  })
+}
+
+// 加载系统设置
+const loadSettings = () => {
+  const savedSettings = storageService.getSystemSettings()
+  Object.assign(systemSettings.value, savedSettings)
 }
 
 const saveSystemSettings = async () => {
   saving.value = true
-  
   try {
-    await invoke('set_setting', { key: 'auto_start', value: systemSettings.value.autoStart.toString() })
-    await invoke('set_setting', { key: 'window_always_on_top', value: systemSettings.value.alwaysOnTop.toString() })
-    await invoke('set_setting', { key: 'minimize_to_tray', value: systemSettings.value.minimizeToTray.toString() })
-    await invoke('set_setting', { key: 'monitoring_interval', value: systemSettings.value.monitoringInterval.toString() })
-    await invoke('set_setting', { key: 'theme', value: systemSettings.value.theme })
-    
-    connectionStatus.value = '系统设置保存成功！'
-    connectionStatusClass.value = 'bg-green-100 text-green-800'
+    storageService.saveSystemSettings(systemSettings.value)
+    toast.saveSuccess('系统设置')
   } catch (error) {
-    connectionStatus.value = `保存失败: ${error}`
-    connectionStatusClass.value = 'bg-red-100 text-red-800'
+    console.error('保存系统设置失败:', error)
+    toast.error('保存失败，请稍后重试')
   } finally {
     saving.value = false
   }
 }
+
+
 
 // 生命周期
 onMounted(async () => {
@@ -380,7 +459,8 @@ onMounted(async () => {
   } catch (error) {
     console.error('调整窗口大小失败:', error)
   }
-  loadSettings()
+  loadApiConfigs() // 加载API配置
+  loadSettings() // 加载系统设置
 })
 </script>
 
