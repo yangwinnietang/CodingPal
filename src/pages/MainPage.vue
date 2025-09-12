@@ -19,34 +19,34 @@
       />
     </div>
     
-    <!-- 状态指示器 -->
-    <div class="status-indicator absolute bottom-2 left-2 flex items-center space-x-2 z-30 pointer-events-auto" data-tauri-drag-region="no-drag">
-      <div :class="statusDotClass" class="w-2 h-2 rounded-full"></div>
-      <span class="text-xs text-gray-600">{{ statusText }}</span>
+    <!-- 状态指示器 - 卡通可爱风格 -->
+    <div class="status-indicator absolute bottom-3 left-3 flex items-center space-x-2 z-30 pointer-events-auto bg-white bg-opacity-90 rounded-full px-3 py-2 shadow-lg" data-tauri-drag-region="no-drag">
+      <div :class="statusDotClass" class="w-3 h-3 rounded-full shadow-sm"></div>
+      <span class="text-sm font-medium text-gray-700">{{ statusText }}</span>
     </div>
     
-    <!-- 快捷操作按钮组 -->
-    <div class="action-buttons absolute bottom-2 right-2 flex space-x-1 z-30 pointer-events-auto" data-tauri-drag-region="no-drag">
+    <!-- 快捷操作按钮组 - 卡通可爱风格 -->
+    <div class="action-buttons absolute bottom-3 right-3 flex space-x-2 z-30 pointer-events-auto" data-tauri-drag-region="no-drag">
       <button 
         @click="openControlPanel"
-        class="action-btn" 
+        class="cute-btn control-btn" 
         title="控制面板"
       >
-        <i class="i-lucide-settings w-4 h-4"></i>
+        <i class="i-lucide-settings w-5 h-5"></i>
       </button>
       <button 
         @click="openSettings"
-        class="action-btn" 
+        class="cute-btn settings-btn" 
         title="设置"
       >
-        <i class="i-lucide-cog w-4 h-4"></i>
+        <i class="i-lucide-cog w-5 h-5"></i>
       </button>
       <button 
         @click="minimizeWindow"
-        class="action-btn" 
+        class="cute-btn minimize-btn" 
         title="最小化"
       >
-        <i class="i-lucide-minus w-4 h-4"></i>
+        <i class="i-lucide-minus w-5 h-5"></i>
       </button>
     </div>
   </div>
@@ -63,7 +63,7 @@ const router = useRouter()
 // 状态管理
 const currentStatus = ref<'rest' | 'thinking' | 'welcome' | 'working'>('welcome')
 const ideProcesses = ref<any[]>([])
-const monitoringInterval = ref<number | null>(null)
+const monitoringInterval = ref<NodeJS.Timeout | null>(null)
 
 // 拖动状态管理
 const isDragging = ref(false)
@@ -189,11 +189,11 @@ onMounted(() => {
   
   // 开始进程监控
   monitorProcesses()
-  monitoringInterval.value = window.setInterval(monitorProcesses, 5000)
+  monitoringInterval.value = setInterval(monitorProcesses, 5000)
   
   // 监听窗口移动事件，保存位置
-  const window = getCurrentWindow()
-  window.listen('tauri://move', () => {
+  const currentWindow = getCurrentWindow()
+  currentWindow.listen('tauri://move', () => {
     saveWindowPosition()
   })
 })
@@ -213,6 +213,52 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* 卡通可爱风格按钮 */
+.cute-btn {
+  @apply w-12 h-12 rounded-full flex items-center justify-center 
+         transition-all duration-300 shadow-lg backdrop-blur-sm
+         border-2 border-white border-opacity-50;
+  transform-origin: center;
+}
+
+.cute-btn:hover {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.cute-btn:active {
+  transform: scale(0.95);
+}
+
+/* 不同按钮的颜色主题 - 修改为与状态指示器相同的背景样式 */
+.control-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.settings-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.minimize-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+}
+
+.minimize-btn:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* 旧样式保留作为备用 */
 .action-btn {
   @apply w-8 h-8 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 
          flex items-center justify-center transition-all duration-200 
@@ -252,6 +298,12 @@ onUnmounted(() => {
 /* 防止拖动区域覆盖交互元素 */
 .drag-region {
   pointer-events: auto;
+}
+
+.action-buttons,
+.status-indicator {
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
 }
 
 .action-buttons *,
