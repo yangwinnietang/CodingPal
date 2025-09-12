@@ -3,8 +3,9 @@
     <!-- 顶部导航 -->
     <div class="header bg-blue-600 text-white p-4 flex items-center justify-between">
       <h1 class="text-lg font-semibold">设置</h1>
-      <button @click="goBack" class="text-white hover:text-gray-200">
-        <i class="i-lucide-x w-5 h-5"></i>
+      <button @click="goBack" class="flex items-center space-x-2 px-3 py-2 text-white bg-blue-500 hover:bg-blue-700 rounded-lg transition-colors duration-200">
+        <i class="i-lucide-arrow-left w-5 h-5"></i>
+        <span class="text-sm font-medium">返回</span>
       </button>
     </div>
     
@@ -235,6 +236,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { invoke } from '@tauri-apps/api/core'
+import { adjustWindowSize, WINDOW_PRESETS } from '../utils/windowManager'
 
 const router = useRouter()
 
@@ -273,7 +275,12 @@ const systemSettings = ref({
 const buildDate = new Date().toLocaleDateString('zh-CN')
 
 // 方法
-const goBack = () => {
+const goBack = async () => {
+  try {
+    await adjustWindowSize(WINDOW_PRESETS.MAIN.width, WINDOW_PRESETS.MAIN.height) // 恢复主页窗口大小
+  } catch (error) {
+    console.error('恢复窗口大小失败:', error)
+  }
   router.push('/')
 }
 
@@ -367,7 +374,12 @@ const saveSystemSettings = async () => {
 }
 
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
+  try {
+    await adjustWindowSize(WINDOW_PRESETS.SETTINGS.width, WINDOW_PRESETS.SETTINGS.height) // 调整设置页面窗口大小
+  } catch (error) {
+    console.error('调整窗口大小失败:', error)
+  }
   loadSettings()
 })
 </script>

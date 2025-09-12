@@ -8,8 +8,9 @@
         </div>
         <h1 class="text-xl font-bold">🎨 CodingPal 控制面板</h1>
       </div>
-      <button @click="goBack" class="cute-close-btn">
-        <i class="i-lucide-x w-5 h-5"></i>
+      <button @click="goBack" class="flex items-center space-x-2 px-4 py-2 text-white bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all duration-200 backdrop-blur-sm">
+        <i class="i-lucide-arrow-left w-5 h-5"></i>
+        <span class="text-sm font-medium">返回</span>
       </button>
     </div>
     
@@ -182,6 +183,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { invoke } from '@tauri-apps/api/core'
+import { adjustWindowSize, WINDOW_PRESETS } from '../utils/windowManager'
 
 const router = useRouter()
 
@@ -217,7 +219,12 @@ const apiStatusText = computed(() =>
 )
 
 // 方法
-const goBack = () => {
+const goBack = async () => {
+  try {
+    await adjustWindowSize(WINDOW_PRESETS.MAIN.width, WINDOW_PRESETS.MAIN.height) // 恢复主页窗口大小
+  } catch (error) {
+    console.error('恢复窗口大小失败:', error)
+  }
   router.push('/')
 }
 
@@ -277,7 +284,12 @@ const getTaskStatusClass = (status: string): string => {
 }
 
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
+  try {
+    await adjustWindowSize(WINDOW_PRESETS.CONTROL_PANEL.width, WINDOW_PRESETS.CONTROL_PANEL.height) // 调整控制面板窗口大小
+  } catch (error) {
+    console.error('调整窗口大小失败:', error)
+  }
   refreshProcesses()
   refreshInterval.value = window.setInterval(refreshProcesses, 5000)
 })
