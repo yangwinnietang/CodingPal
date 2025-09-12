@@ -67,6 +67,10 @@
     },
     "window-state": null,
     "notification": null,
-    "global-shortcut": null
+    "global-shortcut": null,
+    "asset": {
+      "all": true,
+      "scope": ["**/*"]
+    }
   }
 }

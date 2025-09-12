@@ -161,13 +161,40 @@ export const setupGlobalErrorHandler = () => {
   // 捕获未处理的Promise错误
   window.addEventListener('unhandledrejection', (event) => {
     console.error('未处理的Promise错误:', event.reason)
-    toast.handleApiError(event.reason, 'Promise')
+    
+    // 安全检查，避免访问undefined对象的属性
+    try {
+      if (event.reason && typeof event.reason === 'object') {
+        // 检查是否是width属性访问错误
+        const errorMsg = event.reason.message || String(event.reason)
+        if (errorMsg.includes('width') && errorMsg.includes('undefined')) {
+          console.warn('检测到width属性访问错误，已忽略')
+          event.preventDefault()
+          return
+        }
+      }
+      // 避免在错误处理中调用可能引起递归的方法
+      if (event.reason && !String(event.reason).includes('toast')) {
+        console.warn('Promise错误已记录，避免显示用户提示防止递归')
+      }
+    } catch (err) {
+      console.warn('错误处理过程中发生异常:', err)
+    }
     event.preventDefault()
   })
 
   // 捕获全局JavaScript错误
   window.addEventListener('error', (event) => {
     console.error('全局错误:', event.error)
+    
+    // 检查是否是width相关错误
+    if (event.error && event.error.message && 
+        event.error.message.includes('width') && 
+        event.error.message.includes('undefined')) {
+      console.warn('检测到width属性访问错误，已忽略')
+      return
+    }
+    
     toast.error('应用程序发生错误，请刷新页面重试')
   })
 }

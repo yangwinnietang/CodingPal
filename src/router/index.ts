@@ -1,17 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainPage from '@/pages/MainPage.vue'
+import PromptOptimizer from '@/pages/PromptOptimizer.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
-import HistoryPage from '@/pages/HistoryPage.vue'
-import PromptOptimizer from '@/pages/PromptOptimizer.vue'
 import PromptHistory from '@/pages/PromptHistory.vue'
+import HelpPage from '@/pages/HelpPage.vue'
 
 // 定义路由配置
 const routes = [
   {
     path: '/',
-    name: 'main',
+    name: 'home',
     component: MainPage,
+  },
+  {
+    path: '/prompt-optimizer',
+    name: 'prompt-optimizer',
+    component: PromptOptimizer,
   },
   {
     path: '/control-panel',
@@ -24,19 +29,14 @@ const routes = [
     component: SettingsPage,
   },
   {
-    path: '/history',
-    name: 'history',
-    component: HistoryPage,
-  },
-  {
-    path: '/prompt-optimizer',
-    name: 'prompt-optimizer',
-    component: PromptOptimizer,
-  },
-  {
     path: '/prompt-history',
     name: 'prompt-history',
     component: PromptHistory,
+  },
+  {
+    path: '/help',
+    name: 'help',
+    component: HelpPage,
   },
 ]
 

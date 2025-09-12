@@ -112,6 +112,10 @@ export class StorageService {
 
   getUserPreferences(): UserPreferences {
     return this.getItem<UserPreferences>(this.keys.USER_PREFERENCES, {
+      theme: 'light',
+      language: 'zh',
+      autoSave: true,
+      maxHistoryCount: 100,
       defaultTemperature: 0.7,
       maxConcurrentRequests: 3,
       autoSaveHistory: true,
@@ -132,6 +136,9 @@ export class StorageService {
 
   getSystemSettings(): SystemSettings {
     return this.getItem<SystemSettings>(this.keys.SYSTEM_SETTINGS, {
+      version: '1.0.0',
+      lastUpdated: new Date().toISOString(),
+      features: ['optimization', 'history', 'settings'],
       autoStart: false,
       alwaysOnTop: false,
       minimizeToTray: true,

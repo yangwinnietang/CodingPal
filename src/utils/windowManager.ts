@@ -38,7 +38,8 @@ export const getWindowSize = async (): Promise<WindowSize> => {
 export const WINDOW_PRESETS = {
   MAIN: { width: 320, height: 240 },
   SETTINGS: { width: 900, height: 650 },
-  CONTROL_PANEL: { width: 950, height: 700 }
+  CONTROL_PANEL: { width: 950, height: 700 },
+  PROMPT_OPTIMIZER: { width: 1200, height: 800 }
 } as const
 
 // 应用窗口预设

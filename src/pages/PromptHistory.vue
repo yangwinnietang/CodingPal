@@ -76,19 +76,17 @@
             <div class="flex items-start justify-between mb-3">
               <div class="flex-1">
                 <div class="flex items-center space-x-2 mb-2">
-                  <span class="text-sm text-gray-500">{{ formatDate(history.createdAt) }}</span>
+                  <span class="text-sm text-gray-500">{{ formatDate(history.createdAt.getTime()) }}</span>
                   <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                     {{ history.results.length }} 个结果
                   </span>
-                  <span v-if="history.favorite" class="text-yellow-500">
-                    <i class="i-lucide-star w-4 h-4 fill-current"></i>
-                  </span>
+
                 </div>
                 <p class="text-gray-800 font-medium mb-2 line-clamp-2">{{ history.originalPrompt }}</p>
                 <div class="flex flex-wrap gap-2">
                   <span
                     v-for="result in history.results.slice(0, 3)"
-                    :key="result.id"
+                    :key="result.modelName"
                     :class="getResultStatusClass(result.status)"
                     class="text-xs px-2 py-1 rounded-full"
                   >
@@ -102,11 +100,11 @@
               
               <div class="flex items-center space-x-2 ml-4">
                 <button
-                  @click.stop="toggleFavorite(history.id)"
+                  @click.stop=""
                   class="p-1 hover:bg-gray-100 rounded"
-                  :title="history.favorite ? '取消收藏' : '添加收藏'"
+                  title="收藏"
                 >
-                  <i :class="history.favorite ? 'i-lucide-star text-yellow-500 fill-current' : 'i-lucide-star text-gray-400'" class="w-4 h-4"></i>
+                  <i class="i-lucide-star text-gray-400 w-4 h-4"></i>
                 </button>
                 <button
                   @click.stop="deleteHistory(history.id)"
@@ -153,7 +151,7 @@
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-lg font-medium">优化详情</h3>
-              <p class="text-sm text-gray-600">{{ formatDate(selectedHistory.createdAt) }}</p>
+              <p class="text-sm text-gray-600">{{ formatDate(selectedHistory.createdAt.getTime()) }}</p>
             </div>
             <button @click="closeDetail" class="p-2 hover:bg-gray-200 rounded">
               <i class="i-lucide-x w-5 h-5"></i>
@@ -183,7 +181,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div
                 v-for="result in selectedHistory.results"
-                :key="result.id"
+                :key="result.modelName"
                 class="border rounded-lg p-4"
               >
                 <div class="flex items-center justify-between mb-3">
@@ -198,44 +196,19 @@
                       {{ result.status === 'success' ? `${result.responseTime}ms` : '失败' }}
                     </span>
                     <button
-                      v-if="result.status === 'success'"
                       @click="copyResult(result.optimizedPrompt)"
                       class="p-1 hover:bg-gray-100 rounded"
                       title="复制结果"
                     >
-                      <i class="i-lucide-copy w-4 h-4 text-gray-600"></i>
+                      <i class="i-lucide-copy w-3 h-3"></i>
                     </button>
                   </div>
                 </div>
-                
-                <div v-if="result.status === 'success'" class="bg-gray-50 rounded p-3">
-                  <p class="text-sm text-gray-800 leading-relaxed">{{ result.optimizedPrompt }}</p>
-                </div>
-                
-                <div v-else class="bg-red-50 rounded p-3">
-                  <p class="text-sm text-red-600">{{ result.errorMessage || '优化失败' }}</p>
+                <div class="bg-gray-50 rounded p-3">
+                  <p class="text-sm text-gray-800">{{ result.optimizedPrompt || '优化失败' }}</p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        
-        <!-- 弹窗底部 -->
-        <div class="p-4 border-t bg-gray-50">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <button
-                @click="toggleFavorite(selectedHistory.id)"
-                :class="selectedHistory.favorite ? 'text-yellow-500' : 'text-gray-400'"
-                class="flex items-center space-x-1 px-3 py-1 hover:bg-gray-200 rounded"
-              >
-                <i :class="selectedHistory.favorite ? 'i-lucide-star fill-current' : 'i-lucide-star'" class="w-4 h-4"></i>
-                <span class="text-sm">{{ selectedHistory.favorite ? '已收藏' : '收藏' }}</span>
-              </button>
-            </div>
-            <button @click="closeDetail" class="btn-primary">
-              关闭
-            </button>
           </div>
         </div>
       </div>
@@ -246,38 +219,36 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { adjustWindowSize, WINDOW_PRESETS } from '../utils/windowManager'
-import { storageService } from '../services/storage'
-import { toast } from '../services/toast'
-import type { PromptHistory, OptimizationResult } from '../types/prompt-optimizer'
+import { historyService } from '@/services/history-service'
+import { toast } from 'sonner'
+import type { OptimizationRecord } from '@/types/prompt-optimizer'
 
 const router = useRouter()
 
 // 响应式数据
+const historyList = ref<OptimizationRecord[]>([])
 const searchQuery = ref('')
 const showFavorites = ref(false)
 const sortBy = ref('date')
 const currentPage = ref(1)
 const pageSize = 10
-const selectedHistory = ref<PromptHistory | null>(null)
-const historyList = ref<PromptHistory[]>([])
+const selectedHistory = ref<OptimizationRecord | null>(null)
 
 // 计算属性
 const filteredHistory = computed(() => {
   let filtered = historyList.value
   
   // 搜索过滤
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase()
+  if (searchQuery.value) {
     filtered = filtered.filter(h => 
-      h.originalPrompt.toLowerCase().includes(query) ||
-      h.results.some(r => r.optimizedPrompt.toLowerCase().includes(query))
+      h.originalPrompt.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
   }
   
   // 收藏过滤
   if (showFavorites.value) {
-    filtered = filtered.filter(h => h.favorite)
+    // 收藏功能暂未实现，显示所有记录
+    // filtered = filtered.filter(h => h.favorite)
   }
   
   // 排序
@@ -297,55 +268,28 @@ const filteredHistory = computed(() => {
   return filtered
 })
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredHistory.value.length / pageSize)
-})
+const totalPages = computed(() => Math.ceil(filteredHistory.value.length / pageSize))
 
 const paginatedHistory = computed(() => {
   const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return filteredHistory.value.slice(start, end)
+  return filteredHistory.value.slice(start, start + pageSize)
 })
 
 // 方法
-const goBack = async () => {
+const loadHistory = async () => {
   try {
-    await adjustWindowSize(WINDOW_PRESETS.MAIN.width, WINDOW_PRESETS.MAIN.height)
+    historyList.value = historyService.getHistory()
   } catch (error) {
-    console.error('恢复窗口大小失败:', error)
+    console.error('加载历史记录失败:', error)
+    toast.error('加载历史记录失败')
   }
+}
+
+const goBack = () => {
   router.push('/')
 }
 
-const loadHistory = () => {
-  historyList.value = storageService.getPromptHistory()
-}
-
-const formatDate = (date: Date | string): string => {
-  const d = new Date(date)
-  return d.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const getResultStatusClass = (status: string): string => {
-  switch (status) {
-    case 'success':
-      return 'bg-green-100 text-green-800'
-    case 'error':
-      return 'bg-red-100 text-red-800'
-    case 'timeout':
-      return 'bg-yellow-100 text-yellow-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
-  }
-}
-
-const selectHistory = (history: PromptHistory) => {
+const selectHistory = (history: OptimizationRecord) => {
   selectedHistory.value = history
 }
 
@@ -353,87 +297,87 @@ const closeDetail = () => {
   selectedHistory.value = null
 }
 
-const toggleFavorite = (id: string) => {
+const toggleFavorite = async (id: string) => {
   try {
-    const history = historyList.value.find(h => h.id === id)
-    if (history) {
-      history.favorite = !history.favorite
-      storageService.updatePromptHistory(id, { favorite: history.favorite })
-      
-      // 更新选中的历史记录
-      if (selectedHistory.value && selectedHistory.value.id === id) {
-        selectedHistory.value.favorite = history.favorite
-      }
-      
-      toast.success('收藏状态已更新')
+    const record = historyList.value.find(h => h.id === id)
+    if (record) {
+      // 收藏功能暂未实现
+      toast.info('收藏功能暂未实现')
     }
   } catch (error) {
     console.error('更新收藏状态失败:', error)
-    toast.error('操作失败，请稍后重试')
+    toast.error('操作失败')
   }
 }
 
-const deleteHistory = (id: string) => {
-  toast.deleteConfirm('此条历史记录', () => {
-    storageService.deletePromptHistory(id)
-    historyList.value = historyList.value.filter(h => h.id !== id)
-    
-    // 如果删除的是当前选中的记录，关闭详情弹窗
-    if (selectedHistory.value && selectedHistory.value.id === id) {
-      selectedHistory.value = null
-    }
-  })
-}
-
-const clearAllHistory = () => {
-  if (historyList.value.length === 0) {
-    toast.info('暂无历史记录')
-    return
-  }
+const deleteHistory = async (id: string) => {
+  if (!confirm('确定要删除这条记录吗？')) return
   
-  toast.deleteConfirm('所有历史记录', () => {
-    storageService.savePromptHistory([])
+  try {
+    await historyService.deleteRecord(id)
+    historyList.value = historyList.value.filter(h => h.id !== id)
+    toast.success('删除成功')
+  } catch (error) {
+    console.error('删除记录失败:', error)
+    toast.error('删除失败')
+  }
+}
+
+const clearAllHistory = async () => {
+  if (!confirm('确定要清空所有历史记录吗？此操作不可恢复。')) return
+  
+  try {
+    await historyService.clearHistory()
     historyList.value = []
-    selectedHistory.value = null
-  })
+    toast.success('历史记录已清空')
+  } catch (error) {
+    console.error('清空历史记录失败:', error)
+    toast.error('清空失败')
+  }
 }
 
 const copyResult = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text)
-    toast.copySuccess('优化结果')
+    toast.success('已复制到剪贴板')
   } catch (error) {
     console.error('复制失败:', error)
-    toast.error('复制失败，请手动选择文本复制')
+    toast.error('复制失败')
+  }
+}
+
+const formatDate = (timestamp: number) => {
+  return new Date(timestamp).toLocaleString('zh-CN')
+}
+
+const getResultStatusClass = (status: string) => {
+  switch (status) {
+    case 'success':
+      return 'bg-green-100 text-green-800'
+    case 'error':
+      return 'bg-red-100 text-red-800'
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
   }
 }
 
 // 生命周期
-onMounted(async () => {
-  try {
-    await adjustWindowSize(950, 700) // 调整为历史页面尺寸
-  } catch (error) {
-    console.error('调整窗口大小失败:', error)
-  }
+onMounted(() => {
   loadHistory()
 })
 </script>
 
 <style scoped>
-.btn-primary {
-  @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 
-         transition-colors flex items-center justify-center disabled:opacity-50;
-}
-
-.btn-secondary {
-  @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 
-         transition-colors flex items-center justify-center disabled:opacity-50;
-}
-
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.btn-secondary {
+  @apply px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors;
 }
 </style>

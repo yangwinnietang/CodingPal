@@ -221,11 +221,16 @@ const apiStatusText = computed(() =>
 // 方法
 const goBack = async () => {
   try {
-    await adjustWindowSize(WINDOW_PRESETS.MAIN.width, WINDOW_PRESETS.MAIN.height) // 恢复主页窗口大小
+    // 并行执行窗口调整和路由跳转，提高响应速度
+    await Promise.all([
+      adjustWindowSize(WINDOW_PRESETS.MAIN.width, WINDOW_PRESETS.MAIN.height),
+      router.push('/')
+    ])
   } catch (error) {
-    console.error('恢复窗口大小失败:', error)
+    console.error('返回主页失败:', error)
+    // 即使窗口调整失败，也要确保路由跳转执行
+    router.push('/')
   }
-  router.push('/')
 }
 
 const refreshProcesses = async () => {

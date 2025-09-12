@@ -7,6 +7,7 @@ import traeBadgePlugin from 'vite-plugin-trae-solo-badge'
 
 // https://vite.dev/config/
 export default defineConfig({
+  publicDir: 'public', // 明确指定静态资源目录
   build: {
     sourcemap: 'hidden',
   },
