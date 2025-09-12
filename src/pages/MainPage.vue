@@ -28,6 +28,20 @@
     <!-- 快捷操作按钮组 - 卡通可爱风格 -->
     <div class="action-buttons absolute bottom-3 right-3 flex space-x-2 z-30 pointer-events-auto" data-tauri-drag-region="no-drag">
       <button 
+        @click="openPromptOptimizer"
+        class="cute-btn optimizer-btn" 
+        title="AI提示词优化器"
+      >
+        <i class="i-lucide-sparkles w-5 h-5"></i>
+      </button>
+      <button 
+        @click="openPromptHistory"
+        class="cute-btn history-btn" 
+        title="优化历史"
+      >
+        <i class="i-lucide-history w-5 h-5"></i>
+      </button>
+      <button 
         @click="openControlPanel"
         class="cute-btn control-btn" 
         title="控制面板"
@@ -94,6 +108,14 @@ const statusDotClass = computed(() => {
 })
 
 // 方法
+const openPromptOptimizer = () => {
+  router.push('/prompt-optimizer')
+}
+
+const openPromptHistory = () => {
+  router.push('/prompt-history')
+}
+
 const openControlPanel = () => {
   router.push('/control-panel')
 }
@@ -231,6 +253,24 @@ onUnmounted(() => {
 }
 
 /* 不同按钮的颜色主题 - 修改为与状态指示器相同的背景样式 */
+.optimizer-btn {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(147, 51, 234, 0.9));
+  color: white;
+}
+
+.optimizer-btn:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(147, 51, 234, 1));
+}
+
+.history-btn {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(59, 130, 246, 0.9));
+  color: white;
+}
+
+.history-btn:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 1), rgba(59, 130, 246, 1));
+}
+
 .control-btn {
   background: rgba(255, 255, 255, 0.9);
   color: #374151;
@@ -311,4 +351,23 @@ onUnmounted(() => {
   pointer-events: auto;
   -webkit-app-region: no-drag;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>

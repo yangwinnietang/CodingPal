@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="cover/cover.jpg" alt="CodingPal Cover" width="100%" />
+</div>
+
 # CodingPal - AI编程助手 | AI Programming Assistant
 
 [English](#english) | [中文](#中文)
