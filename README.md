@@ -21,7 +21,8 @@
 - **多任务管理**: 支持通过文件夹方式实现AI编程多任务并发处理
 - **操作记录**: 完整记录用户所有操作历史日志和优化结果
 - **AI虚拟形象**: 使用imgs目录下的AI状态图片，实现陪伴式交互
-- **手势识别**: 基于MediaPipe的21个关键点检测，支持9种静态手势识别
+- **手势识别**: 基于MediaPipe的21个关键点检测，支持10种静态手势识别
+- **实时视觉交互**: 通过摄像头实现手势控制和交互功能
 
 ### 🎨 界面设计
 - **主界面**: 320x240px浮动窗口，显示AI虚拟形象和状态指示器
@@ -38,9 +39,11 @@
 - **智能模板**: 内置多种提示词模板，快速生成专业提示词
 - **响应时间统计**: 实时显示各模型的响应时间和性能指标
 - **错误处理**: 完善的错误处理和重试机制
-- **手势交互**: 支持fist、five、gun、love、one、six、three、thumbup、yeah等9种手势
-- **实时检测**: 基于WebRTC摄像头访问，支持21个手部关键点实时检测
+- **手势交互**: 支持fist、five、gun、love、one、two、six、three、thumbup、yeah等10种手势
+- **实时检测**: 基于MediaPipe和WebRTC摄像头访问，支持21个手部关键点实时检测
 - **手势平滑**: 内置手势平滑算法，减少检测抖动，提高识别准确性
+- **3D可视化**: 集成Three.js实现手部关键点3D可视化
+- **消息通知**: 集成Sonner提供优雅的消息提示体验
 
 ## 🛠️ 技术架构
 
@@ -53,6 +56,8 @@
 - **Lucide Icons** - 图标库
 - **MediaPipe** - 手势识别和关键点检测
 - **WebRTC** - 摄像头访问和视频流处理
+- **Three.js** - 3D图形渲染和可视化
+- **Sonner** - 优雅的消息提示组件
 
 ### 后端技术栈
 - **Tauri 2.x** - 跨平台桌面应用框架
@@ -118,6 +123,8 @@ CodingPal/
 - Node.js 18+
 - Rust 1.77.2+
 - Windows 10/11
+- 摄像头设备（用于手势识别功能）
+- 现代浏览器（支持WebRTC和MediaPipe）
 
 ### 开发环境设置
 
@@ -230,12 +237,14 @@ save_optimization_history(history: PromptHistory) -> Result<String, String>
 11. **手势历史**: 查看手势识别历史记录和统计数据
 
 ### 手势识别功能
-- **支持手势**: 握拳(fist)、张开(five)、手枪(gun)、爱心(love)、食指(one)、六(six)、三(three)、点赞(thumbup)、耶(yeah)
-- **检测精度**: 基于21个手部关键点的高精度检测
-- **实时性能**: 支持15-60FPS的实时检测
-- **配置选项**: 可调节检测阈值、帧率、分辨率等参数
-- **数据存储**: 自动保存手势识别历史和统计数据
+- **支持手势**: 握拳(fist)、张开(five)、手枪(gun)、爱心(love)、食指(one)、二指(two)、六(six)、三(three)、点赞(thumbup)、耶(yeah)
+- **检测精度**: 基于MediaPipe 21个手部关键点的高精度检测
+- **实时性能**: 支持15-60FPS的实时检测，可配置分辨率
+- **配置选项**: 可调节检测阈值(0.1-1.0)、帧率(15/30/60)、分辨率(640x480/1280x720/1920x1080)等参数
+- **数据存储**: 自动保存手势识别历史和统计数据到SQLite数据库
 - **平滑算法**: 内置手势平滑处理，减少误检和抖动
+- **3D可视化**: 使用Three.js渲染手部关键点3D模型
+- **实时反馈**: 显示置信度、检测状态和性能指标
 
 ### 提示词优化功能
 1. **输入提示词**: 在优化器页面输入原始提示词
@@ -258,9 +267,11 @@ save_optimization_history(history: PromptHistory) -> Result<String, String>
 ## 🔒 系统要求
 
 - **操作系统**: Windows 10/11 (64位)
-- **内存**: 最低512MB可用内存
-- **存储**: 最低100MB可用空间
-- **网络**: 需要网络连接以使用GLM4.5 API功能
+- **内存**: 最低1GB可用内存（手势识别需要更多内存）
+- **存储**: 最低200MB可用空间
+- **网络**: 需要网络连接以使用AI API功能
+- **摄像头**: USB摄像头或内置摄像头（用于手势识别）
+- **显卡**: 支持硬件加速的显卡（推荐，用于更好的性能）
 
 ## 📄 许可证
 
@@ -299,6 +310,8 @@ A professional AI programming assistant designed for Windows desktop environment
 - **Multi-Task Management**: Support for AI programming multi-task concurrent processing through folder management
 - **Operation Records**: Complete logging of all user operations and optimization results
 - **AI Avatar**: Interactive AI companion using status images from imgs directory
+- **Gesture Recognition**: MediaPipe-based 21-point hand landmark detection supporting 10 static gestures
+- **Real-time Visual Interaction**: Camera-based gesture control and interaction features
 
 ### 🎨 Interface Design
 - **Main Interface**: 320x240px floating window with AI avatar and status indicators
@@ -313,6 +326,11 @@ A professional AI programming assistant designed for Windows desktop environment
 - **Smart Templates**: Built-in prompt templates for quick professional prompt generation
 - **Response Time Statistics**: Real-time display of response times and performance metrics for each model
 - **Error Handling**: Comprehensive error handling and retry mechanisms
+- **Gesture Interaction**: Support for fist, five, gun, love, one, two, six, three, thumbup, yeah gestures
+- **Real-time Detection**: MediaPipe and WebRTC-based real-time 21-point hand landmark detection
+- **Gesture Smoothing**: Built-in gesture smoothing algorithms to reduce detection jitter
+- **3D Visualization**: Three.js integration for 3D hand landmark visualization
+- **Elegant Notifications**: Sonner integration for beautiful message notifications
 
 ## 🛠️ Technical Architecture
 
@@ -323,6 +341,10 @@ A professional AI programming assistant designed for Windows desktop environment
 - **Vue Router** - Routing management
 - **Axios** - HTTP client
 - **Lucide Icons** - Icon library
+- **MediaPipe** - Hand gesture recognition and landmark detection
+- **WebRTC** - Camera access and video stream processing
+- **Three.js** - 3D graphics rendering and visualization
+- **Sonner** - Elegant toast notification component
 
 ### Backend Stack
 - **Tauri 2.x** - Cross-platform desktop application framework
@@ -342,6 +364,8 @@ A professional AI programming assistant designed for Windows desktop environment
 - Node.js 18+
 - Rust 1.77.2+
 - Windows 10/11
+- Camera device (for gesture recognition features)
+- Modern browser (supporting WebRTC and MediaPipe)
 
 ### Development Setup
 
@@ -448,9 +472,11 @@ save_optimization_history(history: PromptHistory) -> Result<String, String>
 ## 🔒 System Requirements
 
 - **Operating System**: Windows 10/11 (64-bit)
-- **Memory**: Minimum 512MB available memory
-- **Storage**: Minimum 100MB available space
+- **Memory**: Minimum 1GB available memory (gesture recognition requires more memory)
+- **Storage**: Minimum 200MB available space
 - **Network**: Internet connection required for AI API functionality
+- **Camera**: USB camera or built-in camera (for gesture recognition)
+- **Graphics**: Hardware-accelerated graphics card (recommended for better performance)
 
 ## 📄 License
 
