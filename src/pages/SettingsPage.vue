@@ -298,7 +298,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { adjustWindowSize, WINDOW_PRESETS } from '../utils/windowManager'
 import { apiKeyService } from '../services/api-key-service'
@@ -465,6 +465,9 @@ const testConnection = async (modelName: ModelName) => {
     const isConnected = await multiModelService.testConnection(modelName, apiKey)
     pageState.connectionStatus[modelName] = isConnected ? 'connected' : 'disconnected'
     
+    // 保存连接状态到localStorage
+    localStorage.setItem('api_connection_status', JSON.stringify(pageState.connectionStatus))
+    
     if (isConnected) {
       toast.success(`${MODEL_CONFIGS[modelName].displayName} 连接成功`)
     } else {
@@ -472,6 +475,8 @@ const testConnection = async (modelName: ModelName) => {
     }
   } catch (error) {
     pageState.connectionStatus[modelName] = 'disconnected'
+    // 保存连接状态到localStorage
+    localStorage.setItem('api_connection_status', JSON.stringify(pageState.connectionStatus))
     toast.error(`${MODEL_CONFIGS[modelName].displayName} 连接测试失败`)
   } finally {
     pageState.testingConnections[modelName] = false
@@ -642,6 +647,16 @@ const loadSettings = () => {
   } catch (error) {
     console.error('加载用户偏好失败:', error)
   }
+  
+  // 加载API连接状态
+  try {
+    const connectionStatus = localStorage.getItem('api_connection_status')
+    if (connectionStatus) {
+      Object.assign(pageState.connectionStatus, JSON.parse(connectionStatus))
+    }
+  } catch (error) {
+    console.error('加载连接状态失败:', error)
+  }
 }
 
 // 生命周期
@@ -656,6 +671,15 @@ onMounted(() => {
   setTimeout(() => {
     connectionMessage.value = ''
   }, 100)
+})
+
+// 页面卸载时自动保存连接状态
+onBeforeUnmount(() => {
+  try {
+    localStorage.setItem('api_connection_status', JSON.stringify(pageState.connectionStatus))
+  } catch (error) {
+    console.error('保存连接状态失败:', error)
+  }
 })
 </script>
 

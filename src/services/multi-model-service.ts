@@ -115,7 +115,7 @@ class KimiApiClient extends BaseApiClient {
     
     try {
       const request: KimiRequest = {
-        model: 'kimi-k2-0905-preview',
+        model: 'moonshot-v1-8k',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: `请优化以下提示词：\n\n${originalPrompt}` }
@@ -158,7 +158,7 @@ class KimiApiClient extends BaseApiClient {
   async testConnection(): Promise<boolean> {
     try {
       const request: KimiRequest = {
-        model: 'kimi-k2-0905-preview',
+        model: 'moonshot-v1-8k',
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1
       }
@@ -248,12 +248,15 @@ export class MultiModelService implements IMultiModelService {
 
   private initializeClient(modelName: ModelName, apiKey: string): void {
     switch (modelName) {
+      case 'GLM4.5-Air':
       case 'glm-4.5-air':
         this.clients.set(modelName, new GLMApiClient(modelName, apiKey))
         break
+      case 'KimiK2':
       case 'kimi-k2':
         this.clients.set(modelName, new KimiApiClient(modelName, apiKey))
         break
+      case 'DeepSeek V3.1':
       case 'deepseek-chat':
         this.clients.set(modelName, new DeepSeekApiClient(modelName, apiKey))
         break

@@ -43,7 +43,7 @@ export interface GLMResponse {
 
 // KimiK2 API接口
 export interface KimiRequest {
-  model: 'kimi-k2-0905-preview'
+  model: 'moonshot-v1-8k'
   messages: Array<{
     role: 'system' | 'user' | 'assistant'
     content: string
