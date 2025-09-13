@@ -86,8 +86,8 @@
 - **Reqwest** - HTTP客户端
 
 ### 支持的AI模型
-- **GLM-4-Air** - 智谱AI的高性能模型
-- **Moonshot-v1-8k** - Kimi的长文本处理模型
+- **GLM-4.5-Air** - 智谱AI的高性能模型
+- **KimiK2-0905** - Kimi的长文本处理模型
 - **DeepSeek-Chat** - DeepSeek的对话模型
 
 ### 项目结构
