@@ -3,6 +3,8 @@ import type { GestureType, GestureResult, Point } from '@/types/gesture'
 import { GESTURE_CONFIG, HAND_LANDMARKS } from '@/types/gesture'
 
 
+
+
 // 计算两点之间的距离
 export const calculateDistance = (p1: Point, p2: Point): number => {
   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2))
@@ -91,6 +93,7 @@ export const recognizeGesture = (landmarks: Point[]): GestureResult => {
   }
   // 胜利手势：食指和中指伸直
   else if (indexExtended && middleExtended && !ringExtended && !pinkyExtended) {
+
     gestureType = 'two'
 
 

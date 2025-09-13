@@ -10,6 +10,12 @@ export default defineConfig({
   publicDir: 'public', // 明确指定静态资源目录
   build: {
     sourcemap: 'hidden',
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        mobile: path.resolve(__dirname, 'mobile.html')
+      }
+    }
   },
   plugins: [
     vue(),

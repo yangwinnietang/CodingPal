@@ -196,6 +196,99 @@ create_task_folder(folder_name: String) -> Result<String, String>
 save_optimization_history(history: PromptHistory) -> Result<String, String>
 ```
 
+## 📱 Android移动端开发
+
+### 移动端特性
+- **跨平台支持**: 基于Capacitor框架，将Vue3应用打包为原生Android应用
+- **移动端UI**: 使用Ionic Framework组件，提供原生移动端体验
+- **手势识别**: 移动端摄像头手势检测，支持前后摄像头切换
+- **离线存储**: SQLite本地数据库，支持离线使用
+- **原生功能**: 集成摄像头、剪贴板、分享、触觉反馈等原生功能
+- **Material Design**: 遵循Material Design设计规范
+
+### Android开发环境配置
+
+1. **安装Android Studio**
+   - 下载并安装Android Studio
+   - 安装Android SDK (API Level 24+)
+   - 配置ANDROID_HOME环境变量
+
+2. **配置SDK路径**
+   ```bash
+   # 编辑 android/local.properties 文件
+   sdk.dir=C:\Users\YourUsername\AppData\Local\Android\Sdk
+   ```
+
+3. **安装Capacitor依赖**
+   ```bash
+   npm install @capacitor/core @capacitor/android
+   npm install @ionic/vue @ionic/vue-router
+   npm install @capacitor/camera @capacitor/clipboard @capacitor/share
+   ```
+
+### 构建Android APK
+
+1. **自动构建脚本**
+   ```bash
+   # 运行自动构建脚本
+   .\build-android.bat
+   ```
+
+2. **手动构建步骤**
+   ```bash
+   # 1. 构建Web应用
+   npm run build
+   
+   # 2. 同步到Android项目
+   npx cap sync android
+   
+   # 3. 构建APK
+   cd android
+   .\gradlew assembleDebug
+   ```
+
+3. **APK输出位置**
+   ```
+   android/app/build/outputs/apk/debug/app-debug.apk
+   ```
+
+### 移动端页面结构
+```
+src/pages/mobile/
+├── MobileLayout.vue      # 移动端布局组件
+├── MobileHome.vue        # AI优化主页面
+├── MobileGesture.vue     # 手势识别页面
+├── MobileSettings.vue    # 设置页面
+└── MobileHistory.vue     # 历史记录页面
+```
+
+### 移动端技术栈
+- **Capacitor 5.0** - 跨平台移动应用框架
+- **Ionic Vue** - 移动端UI组件库
+- **Vue 3 + TypeScript** - 前端框架
+- **TensorFlow Lite** - 移动端AI推理
+- **MediaPipe** - 手势识别
+- **SQLite** - 本地数据存储
+
+### Android权限配置
+```xml
+<!-- AndroidManifest.xml -->
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.VIBRATE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+### 移动端功能特性
+- **底部导航**: Material Design风格的Tab导航
+- **手势识别**: 支持前后摄像头，实时手势检测
+- **触觉反馈**: 按钮点击震动反馈
+- **分享功能**: 原生分享API集成
+- **剪贴板**: 复制粘贴功能
+- **离线模式**: 本地数据缓存和同步
+- **响应式设计**: 适配不同屏幕尺寸
+
 ## 🔧 配置说明
 
 ### 窗口配置

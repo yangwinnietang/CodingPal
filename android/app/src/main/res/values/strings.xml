@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CodingPal</string>
+    <string name="title_activity_main">CodingPal</string>
+    <string name="package_name">com.codingpal.app</string>
+    <string name="custom_url_scheme">com.codingpal.app</string>
+</resources>
