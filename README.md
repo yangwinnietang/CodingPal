@@ -21,6 +21,7 @@
 - **多任务管理**: 支持通过文件夹方式实现AI编程多任务并发处理
 - **操作记录**: 完整记录用户所有操作历史日志和优化结果
 - **AI虚拟形象**: 使用imgs目录下的AI状态图片，实现陪伴式交互
+- **手势识别**: 基于MediaPipe的21个关键点检测，支持9种静态手势识别
 
 ### 🎨 界面设计
 - **主界面**: 320x240px浮动窗口，显示AI虚拟形象和状态指示器
@@ -28,6 +29,7 @@
 - **提示词优化器**: 专业的提示词优化界面，支持多模型并发优化
 - **历史记录**: 操作日志查看、提示词优化历史、统计数据
 - **设置页面**: 多模型API配置、系统设置、快捷键配置
+- **手势识别页面**: 实时摄像头预览、手势检测、配置管理、历史记录
 - **响应式字体设计**: 使用Tailwind CSS的clamp()函数实现字体大小自适应，在不同屏幕尺寸下提供最佳阅读体验
 
 ### ⚡ 新增特性
@@ -36,6 +38,9 @@
 - **智能模板**: 内置多种提示词模板，快速生成专业提示词
 - **响应时间统计**: 实时显示各模型的响应时间和性能指标
 - **错误处理**: 完善的错误处理和重试机制
+- **手势交互**: 支持fist、five、gun、love、one、six、three、thumbup、yeah等9种手势
+- **实时检测**: 基于WebRTC摄像头访问，支持21个手部关键点实时检测
+- **手势平滑**: 内置手势平滑算法，减少检测抖动，提高识别准确性
 
 ## 🛠️ 技术架构
 
@@ -46,6 +51,8 @@
 - **Vue Router** - 路由管理
 - **Axios** - HTTP客户端
 - **Lucide Icons** - 图标库
+- **MediaPipe** - 手势识别和关键点检测
+- **WebRTC** - 摄像头访问和视频流处理
 
 ### 后端技术栈
 - **Tauri 2.x** - 跨平台桌面应用框架
@@ -70,16 +77,19 @@ CodingPal/
 │   │   ├── ControlPanel.vue # 控制面板
 │   │   ├── PromptOptimizer.vue # 提示词优化器
 │   │   ├── PromptHistory.vue # 优化历史
-│   │   └── SettingsPage.vue # 设置页面
+│   │   ├── SettingsPage.vue # 设置页面
+│   │   └── GesturePage.vue # 手势识别页面
 │   ├── services/          # 业务服务
 │   │   ├── api-client.ts  # API客户端
 │   │   ├── concurrent-optimizer.ts # 并发优化器
 │   │   ├── storage.ts     # 存储服务
 │   │   └── toast.ts       # 消息服务
 │   ├── types/             # 类型定义
-│   │   └── prompt-optimizer.ts # 优化器类型
+│   │   ├── prompt-optimizer.ts # 优化器类型
+│   │   └── gesture.ts     # 手势识别类型
 │   ├── utils/             # 工具函数
-│   │   └── windowManager.ts # 窗口管理
+│   │   ├── windowManager.ts # 窗口管理
+│   │   └── gestureRecognition.ts # 手势识别算法
 │   ├── stores/            # Pinia状态管理
 │   ├── router/            # 路由配置
 │   └── main.ts           # 应用入口
@@ -89,6 +99,7 @@ CodingPal/
 │   │   │   ├── database.rs # 数据库服务
 │   │   │   ├── glm_api.rs # GLM API服务
 │   │   │   └── process_monitor.rs # 进程监控
+│   │   ├── gesture_service.rs # 手势识别服务
 │   │   ├── lib.rs        # 核心功能实现
 │   │   └── main.rs       # 应用入口
 │   ├── Cargo.toml        # Rust依赖配置
@@ -154,6 +165,21 @@ async validateApiKey(config: ApiConfig): Promise<boolean>
 async getModelStatus(modelName: string): Promise<'online' | 'offline' | 'error'>
 ```
 
+### 手势识别相关
+```rust
+// 获取手势配置
+get_gesture_configs() -> Result<Vec<GestureConfig>, String>
+
+// 保存手势记录
+save_gesture_record(gesture_type: String, confidence: f64) -> Result<i64, String>
+
+// 获取手势历史
+get_gesture_history(limit: Option<i32>) -> Result<Vec<GestureRecord>, String>
+
+// 获取手势统计
+get_gesture_stats() -> Result<GestureStats, String>
+```
+
 ### 文件系统管理相关
 ```rust
 // 创建任务文件夹
@@ -173,7 +199,7 @@ save_optimization_history(history: PromptHistory) -> Result<String, String>
 
 ### 数据库配置
 - 数据库文件: `codingpal.db`
-- 支持表: settings, api_configs, process_history, optimization_history, task_folders
+- 支持表: settings, api_configs, process_history, optimization_history, task_folders, gesture_configs, gesture_records, keypoint_data
 
 ### API配置
 - 多模型API集成（GLM-4、Moonshot、DeepSeek）
@@ -198,6 +224,18 @@ save_optimization_history(history: PromptHistory) -> Result<String, String>
 5. **历史管理**: 查看和管理提示词优化历史记录
 6. **任务管理**: 通过控制面板创建和管理编程任务
 7. **状态查看**: 主界面AI虚拟形象实时反映系统工作状态
+8. **手势识别**: 点击手势识别按钮进入手势识别页面
+9. **摄像头权限**: 首次使用需要授权摄像头访问权限
+10. **手势配置**: 在配置页面调整检测阈值和参数
+11. **手势历史**: 查看手势识别历史记录和统计数据
+
+### 手势识别功能
+- **支持手势**: 握拳(fist)、张开(five)、手枪(gun)、爱心(love)、食指(one)、六(six)、三(three)、点赞(thumbup)、耶(yeah)
+- **检测精度**: 基于21个手部关键点的高精度检测
+- **实时性能**: 支持15-60FPS的实时检测
+- **配置选项**: 可调节检测阈值、帧率、分辨率等参数
+- **数据存储**: 自动保存手势识别历史和统计数据
+- **平滑算法**: 内置手势平滑处理，减少误检和抖动
 
 ### 提示词优化功能
 1. **输入提示词**: 在优化器页面输入原始提示词

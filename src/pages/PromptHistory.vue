@@ -362,6 +362,22 @@ const copyResult = async (text: string) => {
   }
 }
 
+const copyAllResults = async () => {
+  if (!selectedHistory.value) return
+  
+  try {
+    const allResults = selectedHistory.value.results
+      .map(result => result.optimizedPrompt)
+      .join('\n\n---\n\n')
+    
+    await navigator.clipboard.writeText(allResults)
+    toast.success('所有结果已复制到剪贴板')
+  } catch (error) {
+    console.error('复制失败:', error)
+    toast.error('复制失败')
+  }
+}
+
 const formatDate = (timestamp: number) => {
   return new Date(timestamp).toLocaleString('zh-CN')
 }

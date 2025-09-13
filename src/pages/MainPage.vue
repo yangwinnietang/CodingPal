@@ -35,11 +35,11 @@
         <i class="i-lucide-sparkles w-5 h-5"></i>
       </button>
       <button 
-        @click="openPromptHistory"
-        class="cute-btn history-btn" 
-        title="优化历史"
+        @click="openGestureRecognition"
+        class="cute-btn gesture-btn" 
+        title="手势识别"
       >
-        <i class="i-lucide-history w-5 h-5"></i>
+        <i class="i-lucide-hand w-5 h-5"></i>
       </button>
       <button 
         @click="openControlPanel"
@@ -120,8 +120,8 @@ const openPromptOptimizer = () => {
   router.push('/prompt-optimizer')
 }
 
-const openPromptHistory = () => {
-  router.push('/prompt-history')
+const openGestureRecognition = () => {
+  router.push('/gesture')
 }
 
 const openControlPanel = () => {
@@ -270,12 +270,12 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 1);
 }
 
-.history-btn {
+.gesture-btn {
   background: rgba(255, 255, 255, 0.9);
   color: #374151;
 }
 
-.history-btn:hover {
+.gesture-btn:hover {
   background: rgba(255, 255, 255, 1);
 }
 

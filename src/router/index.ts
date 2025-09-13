@@ -5,6 +5,7 @@ import ControlPanel from '@/pages/ControlPanel.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
 import PromptHistory from '@/pages/PromptHistory.vue'
 import HelpPage from '@/pages/HelpPage.vue'
+import GesturePage from '@/pages/GesturePage.vue'
 
 // 定义路由配置
 const routes = [
@@ -37,6 +38,11 @@ const routes = [
     path: '/help',
     name: 'help',
     component: HelpPage,
+  },
+  {
+    path: '/gesture',
+    name: 'gesture',
+    component: GesturePage,
   },
 ]
 

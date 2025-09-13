@@ -213,4 +213,9 @@ impl DatabaseService {
         
         Ok(histories)
     }
+    
+    // 获取数据库连接池的方法，供其他服务使用
+    pub fn get_pool(&self) -> &SqlitePool {
+        &self.pool
+    }
 }

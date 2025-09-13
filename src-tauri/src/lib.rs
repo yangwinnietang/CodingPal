@@ -6,7 +6,9 @@ use uuid::Uuid;
 use once_cell::sync::Lazy;
 
 mod services;
+mod gesture_service;
 use services::*;
+use gesture_service::*;
 
 // 全局状态管理
 static PROCESS_MONITOR: Lazy<Mutex<ProcessMonitor>> = Lazy::new(|| {
@@ -211,7 +213,13 @@ pub fn run() {
             get_optimization_history,
             get_setting,
             set_setting,
-            get_process_stats
+            get_process_stats,
+            get_gesture_configs,
+            update_gesture_config,
+            save_gesture_record,
+            get_gesture_history,
+            get_gesture_stats,
+            clear_gesture_history
         ])
         .setup(|_app| {
             // 初始化数据库
@@ -219,6 +227,11 @@ pub fn run() {
                 let database_url = "sqlite::memory:";
                 match DatabaseService::new(database_url).await {
                     Ok(db) => {
+                        // 初始化手势识别表
+                        if let Err(e) = init_gesture_tables(db.get_pool()).await {
+                            eprintln!("初始化手势识别表失败: {}", e);
+                        }
+                        
                         let mut db_guard = DATABASE.lock().unwrap();
                         *db_guard = Some(db);
                         println!("数据库初始化成功");

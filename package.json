@@ -17,6 +17,9 @@
     "tauri:build": "tauri build"
   },
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
+    "@mediapipe/hands": "^0.4.1675469240",
     "axios": "^1.12.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
@@ -24,6 +27,7 @@
     "express": "^4.21.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.0",
+    "three": "^0.180.0",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"
   },
