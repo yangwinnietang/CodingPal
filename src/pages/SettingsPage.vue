@@ -715,6 +715,9 @@ input:checked + .slider:before {
 }
 
 .settings-page {
-  height: calc(100vh - 2rem);
+  min-height: calc(100vh - 2rem);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
 }
 </style>
