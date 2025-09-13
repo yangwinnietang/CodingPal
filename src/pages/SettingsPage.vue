@@ -1,7 +1,7 @@
 <template>
-  <div class="settings-page w-full h-full bg-white rounded-lg shadow-lg overflow-hidden">
+  <div class="settings-page w-full h-full bg-gray-50 rounded-lg shadow-lg overflow-hidden">
     <!-- 顶部导航 -->
-    <div class="header bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex items-center justify-between">
+    <div class="header bg-slate-800 text-white p-4 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
           <i class="i-lucide-settings w-5 h-5"></i>
@@ -15,7 +15,7 @@
     </div>
     
     <!-- 标签页导航 -->
-    <div class="tabs flex border-b bg-gray-50">
+    <div class="tabs flex border-b bg-white">
       <button 
         v-for="tab in tabs" 
         :key="tab.key"
@@ -23,7 +23,7 @@
         :class="[
           'px-6 py-3 text-sm font-medium transition-all duration-200 flex items-center space-x-2',
           activeTab === tab.key 
-            ? 'border-b-2 border-blue-600 text-blue-600 bg-white' 
+            ? 'border-b-2 border-slate-600 text-slate-600 bg-white' 
             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
         ]"
       >
@@ -33,7 +33,7 @@
     </div>
     
     <!-- 内容区域 -->
-    <div class="content flex-1 p-6 overflow-y-auto">
+    <div class="content flex-1 p-6 overflow-y-auto bg-gray-50">
       <!-- API配置 -->
       <div v-if="activeTab === 'api'" class="api-settings">
         <div class="mb-6">
@@ -42,15 +42,15 @@
           
           <!-- 模型配置卡片 -->
           <div class="space-y-6">
-            <div v-for="modelName in modelNames" :key="modelName" class="border rounded-xl p-6 hover:shadow-md transition-shadow">
+            <div v-for="modelName in modelNames" :key="modelName" class="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow bg-white">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <i class="i-lucide-brain w-5 h-5 text-white"></i>
+                  <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <i class="i-lucide-brain w-5 h-5 text-slate-600"></i>
                   </div>
                   <div>
-                    <h3 class="font-semibold text-lg">{{ MODEL_CONFIGS[modelName].displayName }}</h3>
-                    <p class="text-sm text-gray-500">{{ MODEL_CONFIGS[modelName].rateLimit }} RPM · 温度 {{ MODEL_CONFIGS[modelName].defaultTemperature }}</p>
+                    <h3 class="font-semibold text-lg text-gray-700">{{ MODEL_CONFIGS[modelName].displayName }}</h3>
+                    <p class="text-sm text-gray-600">{{ MODEL_CONFIGS[modelName].rateLimit }} RPM · 温度 {{ MODEL_CONFIGS[modelName].defaultTemperature }}</p>
                   </div>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -72,7 +72,7 @@
                         @input="updateApiKey(modelName, ($event.target as HTMLInputElement).value)"
                         :type="showApiKeys[modelName] ? 'text' : 'password'"
                         :placeholder="getApiKeyPlaceholder(modelName)"
-                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 pr-10"
                       />
                       <button 
                         @click="toggleApiKeyVisibility(modelName)"
@@ -84,27 +84,27 @@
                     <button 
                       @click="testConnection(modelName)"
                       :disabled="pageState.testingConnections[modelName] || !getApiKey(modelName)"
-                      class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="px-4 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       :title="'测试 ' + MODEL_CONFIGS[modelName].displayName + ' 连接'"
                     >
                       <i v-if="pageState.testingConnections[modelName]" class="i-lucide-loader-2 w-4 h-4 animate-spin"></i>
                       <i v-else class="i-lucide-zap w-4 h-4"></i>
                     </button>
                   </div>
-                  <p class="text-xs text-gray-500 mt-1">请从官方平台获取API密钥，密钥将被加密存储</p>
+                  <p class="text-xs text-gray-600 mt-1">请从官方平台获取API密钥，密钥将被加密存储</p>
                 </div>
               </div>
             </div>
           </div>
           
           <!-- 模型参数配置 -->
-          <div class="mt-8 border rounded-xl p-6">
+          <div class="mt-8 border border-gray-200 rounded-lg p-6 bg-white">
             <h3 class="text-lg font-semibold mb-4">模型参数</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  温度参数 ({{ modelParameters.temperature }})
-                </label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    温度参数 ({{ modelParameters.temperature }})
+                  </label>
                 <input 
                   v-model.number="modelParameters.temperature" 
                   type="range" 
@@ -114,22 +114,22 @@
                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   @change="saveModelParameters"
                 />
-                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <div class="flex justify-between text-xs text-gray-600 mt-1">
                   <span>保守 (0.0)</span>
                   <span>创新 (1.0)</span>
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  最大令牌数
-                </label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    最大令牌数
+                  </label>
                 <input 
                   v-model.number="modelParameters.maxTokens" 
                   type="number" 
                   min="100" 
                   max="4000"
                   step="100"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
                   @blur="saveModelParameters"
                 />
               </div>
@@ -142,7 +142,7 @@
                 v-model="modelParameters.systemPrompt" 
                 rows="3"
                 placeholder="自定义系统提示词（留空使用默认）"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 resize-none"
                 @blur="saveModelParameters"
               ></textarea>
             </div>
@@ -186,15 +186,15 @@
           <p class="text-gray-600 mb-6">个性化您的使用体验</p>
           
           <div class="space-y-6">
-            <div class="border rounded-xl p-6">
+            <div class="border border-gray-200 rounded-lg p-6 bg-white">
               <h3 class="text-lg font-semibold mb-4">界面设置</h3>
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="font-medium">主题模式</h4>
+                    <h4 class="font-medium text-gray-700">主题模式</h4>
                     <p class="text-sm text-gray-600">选择您偏好的界面主题</p>
                   </div>
-                  <select v-model="userPreferences.theme" @change="saveUserPreferences" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                  <select v-model="userPreferences.theme" @change="saveUserPreferences" class="p-2 border rounded-lg focus:ring-2 focus:ring-slate-500">
                     <option value="light">浅色</option>
                     <option value="dark">深色</option>
                     <option value="auto">跟随系统</option>
@@ -203,10 +203,10 @@
                 
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="font-medium">语言</h4>
+                    <h4 class="font-medium text-gray-700">语言</h4>
                     <p class="text-sm text-gray-600">界面显示语言</p>
                   </div>
-                  <select v-model="userPreferences.language" @change="saveUserPreferences" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                  <select v-model="userPreferences.language" @change="saveUserPreferences" class="p-2 border rounded-lg focus:ring-2 focus:ring-slate-500">
                     <option value="zh-CN">简体中文</option>
                     <option value="en-US">English</option>
                   </select>
@@ -214,7 +214,7 @@
                 
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="font-medium">自动保存</h4>
+                    <h4 class="font-medium text-gray-700">自动保存</h4>
                     <p class="text-sm text-gray-600">自动保存优化结果到历史记录</p>
                   </div>
                   <label class="switch">
@@ -235,56 +235,56 @@
           <p class="text-gray-600 mb-6">多模型提示词优化智能体</p>
           
           <div class="space-y-6">
-            <div class="border rounded-xl p-6 text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="i-lucide-sparkles w-8 h-8 text-white"></i>
+            <div class="border border-gray-200 rounded-lg p-6 text-center bg-white">
+              <div class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <i class="i-lucide-sparkles w-8 h-8 text-slate-600"></i>
               </div>
               <h3 class="text-xl font-semibold mb-2">CodingPal</h3>
               <p class="text-gray-600 mb-4">多模型提示词优化智能体</p>
-              <p class="text-sm text-gray-500">版本 1.0.0</p>
+              <p class="text-sm text-gray-600">版本 1.0.0</p>
             </div>
             
-            <div class="border rounded-xl p-6">
+            <div class="border border-gray-200 rounded-lg p-6 bg-white">
               <h3 class="text-lg font-semibold mb-4">支持的模型</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div v-for="modelName in modelNames" :key="modelName" class="text-center p-4 bg-gray-50 rounded-lg">
-                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <i class="i-lucide-brain w-4 h-4 text-blue-600"></i>
+                <div v-for="modelName in modelNames" :key="modelName" class="text-center p-4 bg-slate-50 rounded-lg">
+                  <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="i-lucide-brain w-4 h-4 text-slate-600"></i>
                   </div>
-                  <h4 class="font-medium">{{ MODEL_CONFIGS[modelName].displayName }}</h4>
-                  <p class="text-xs text-gray-500 mt-1">{{ MODEL_CONFIGS[modelName].rateLimit }} RPM</p>
+                  <h4 class="font-medium text-gray-700">{{ MODEL_CONFIGS[modelName].displayName }}</h4>
+                  <p class="text-xs text-gray-600 mt-1">{{ MODEL_CONFIGS[modelName].rateLimit }} RPM</p>
                 </div>
               </div>
             </div>
             
-            <div class="border rounded-xl p-6">
+            <div class="border border-gray-200 rounded-lg p-6 bg-white">
               <h3 class="text-lg font-semibold mb-4">功能特性</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="flex items-start space-x-3">
                   <i class="i-lucide-zap w-5 h-5 text-blue-600 mt-0.5"></i>
                   <div>
-                    <h4 class="font-medium">并发优化</h4>
+                    <h4 class="font-medium text-gray-700">并发优化</h4>
                     <p class="text-sm text-gray-600">同时调用多个AI模型进行提示词优化</p>
                   </div>
                 </div>
                 <div class="flex items-start space-x-3">
                   <i class="i-lucide-shield w-5 h-5 text-green-600 mt-0.5"></i>
                   <div>
-                    <h4 class="font-medium">安全存储</h4>
+                    <h4 class="font-medium text-gray-700">安全存储</h4>
                     <p class="text-sm text-gray-600">API密钥加密存储，保护您的隐私</p>
                   </div>
                 </div>
                 <div class="flex items-start space-x-3">
                   <i class="i-lucide-history w-5 h-5 text-purple-600 mt-0.5"></i>
                   <div>
-                    <h4 class="font-medium">历史记录</h4>
+                    <h4 class="font-medium text-gray-700">历史记录</h4>
                     <p class="text-sm text-gray-600">自动保存优化历史，支持搜索和导出</p>
                   </div>
                 </div>
                 <div class="flex items-start space-x-3">
                   <i class="i-lucide-star w-5 h-5 text-yellow-600 mt-0.5"></i>
                   <div>
-                    <h4 class="font-medium">智能评分</h4>
+                    <h4 class="font-medium text-gray-700">智能评分</h4>
                     <p class="text-sm text-gray-600">对优化结果进行评分，持续改进</p>
                   </div>
                 </div>
@@ -685,7 +685,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center;
+  @apply bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center;
 }
 
 .btn-secondary {
@@ -731,7 +731,7 @@ onBeforeUnmount(() => {
 }
 
 input:checked + .slider {
-  background-color: #3b82f6;
+  background-color: #475569;
 }
 
 input:checked + .slider:before {
