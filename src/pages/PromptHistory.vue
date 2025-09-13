@@ -6,7 +6,7 @@
         <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
           <i class="i-lucide-history w-6 h-6 text-gray-600"></i>
         </div>
-        <h1 class="text-xl font-bold text-gray-900">优化历史</h1>
+        <h1 class="text-lg font-bold text-gray-900">优化历史</h1>
       </div>
       <button @click="goBack" class="flex items-center space-x-2 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200">
         <i class="i-lucide-arrow-left w-5 h-5"></i>
@@ -82,7 +82,7 @@
                   </span>
 
                 </div>
-                <p class="text-gray-800 font-semibold mb-3 line-clamp-2 text-lg">{{ history.originalPrompt }}</p>
+                <p class="text-gray-800 font-semibold mb-3 line-clamp-2 text-base">{{ history.originalPrompt }}</p>
                 <div class="flex flex-wrap gap-2">
                   <span
                     v-for="result in history.results.slice(0, 3)"
@@ -150,7 +150,7 @@
         <div class="p-6 border-b bg-white">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-xl font-bold text-gray-900">优化详情</h3>
+              <h3 class="text-lg font-bold text-gray-900">优化详情</h3>
               <p class="text-sm text-gray-500 font-medium mt-1">{{ formatDate(selectedHistory.createdAt.getTime()) }}</p>
             </div>
             <button @click="closeDetail" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
@@ -163,7 +163,7 @@
         <div class="p-6 overflow-y-auto max-h-[60vh]">
           <!-- 原始提示词 -->
           <div class="mb-8">
-            <h4 class="font-semibold mb-3 flex items-center text-lg">
+            <h4 class="font-semibold mb-3 flex items-center text-base">
               <i class="i-lucide-edit w-5 h-5 mr-3 text-blue-600"></i>
               原始提示词
             </h4>
@@ -174,7 +174,7 @@
           
           <!-- 优化结果对比 -->
           <div>
-            <h4 class="font-semibold mb-4 flex items-center text-lg">
+            <h4 class="font-semibold mb-4 flex items-center text-base">
               <i class="i-lucide-sparkles w-5 h-5 mr-3 text-green-600"></i>
               优化结果对比
             </h4>

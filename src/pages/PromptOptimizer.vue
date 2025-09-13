@@ -1,69 +1,191 @@
 <template>
   <div class="prompt-optimizer w-full h-full bg-gray-50 overflow-hidden">
+
+
+
     <!-- 顶部导航 - 简约科技风格 -->
+
+
+
     <div class="header bg-white border-b border-gray-200 text-gray-900 p-6 flex items-center justify-between">
+
+
+
       <div class="flex items-center space-x-4">
+
+
+
         <div class="w-10 h-10 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center">
+
+
+
           <i class="i-lucide-sparkles w-6 h-6 text-blue-600"></i>
+
+
+
+
+
         </div>
-        <h1 class="text-xl font-bold tracking-tight">AI提示词优化器</h1>
+
+
+
+
+        <h1 class="text-lg font-bold tracking-tight">AI提示词优化器</h1>
+
       </div>
+
+
+
       <button @click="goBack" class="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 border border-gray-200">
+
         <i class="i-lucide-arrow-left w-5 h-5"></i>
+
+
+
         <span class="text-sm font-medium">返回</span>
+
       </button>
+
     </div>
 
+
+
+
     <div class="flex h-full">
+
       <!-- 左侧输入区域 -->
+
+
+
       <div class="w-1/2 border-r flex flex-col">
+
+
+
         <div class="p-6 border-b bg-white">
-          <h2 class="text-lg font-semibold mb-2 text-gray-800">原始提示词</h2>
+
+
+
+          <h2 class="text-base font-semibold mb-2 text-gray-800">原始提示词</h2>
+
           <p class="text-sm text-gray-600">输入您想要优化的提示词，AI将为您提供多个优化版本</p>
+
         </div>
+
+
+
         
+
+
+
         <div class="flex-1 p-6 flex flex-col bg-gray-50">
+
           <!-- 输入框 -->
+
           <div class="flex-1 mb-6">
+
             <textarea
+
               v-model="pageState.inputPrompt"
+
+
+
               placeholder="请输入您的提示词...\n\n例如：我想创建一个用户友好的登录界面，包含用户名、密码输入框和记住我选项"
+
+
+
               class="w-full h-full p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200"
+
+
+
               :disabled="pageState.isOptimizing"
+
+
+
             ></textarea>
+
+
+
           </div>
+
+
+
           
+
+
+
+
+
+
+
+
+
+
           <!-- 字符统计和模型选择 -->
+
           <div class="mb-6">
+
             <div class="flex items-center justify-between mb-4">
               <span class="text-sm text-gray-500 font-medium">{{ pageState.inputPrompt.length }} 字符</span>
               <button @click="clearInput" :disabled="pageState.isOptimizing" class="text-sm text-gray-500 hover:text-gray-700 p-2 hover:bg-white rounded-lg transition-colors">
+
+
                 <i class="i-lucide-trash-2 w-4 h-4"></i>
+
+
               </button>
+
             </div>
+
             
+
+
+
+
             <!-- 模型选择面板 -->
+
             <div class="space-y-3">
+
               <label class="text-sm font-semibold text-gray-800">选择模型：</label>
+
               <div class="grid grid-cols-1 gap-3">
+
                 <label v-for="modelName in availableModels" :key="modelName" class="flex items-center p-4 border border-gray-300 rounded-xl hover:border-blue-400 hover:bg-white cursor-pointer transition-all duration-200">
+
                   <input 
+
                     type="checkbox" 
+
                     :value="modelName" 
+
                     v-model="pageState.selectedModels"
+
                     class="mr-4 text-blue-600 focus:ring-blue-500 w-4 h-4"
+
                     :disabled="pageState.isOptimizing"
+
                   >
+
                   <div class="flex-1">
+
                     <div class="flex items-center justify-between">
+
                       <span class="font-semibold text-gray-700">{{ MODEL_CONFIGS[modelName].displayName }}</span>
+
                       <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{{ MODEL_CONFIGS[modelName].rateLimit }} RPM</span>
+
+
                     </div>
+
                     <div class="text-xs text-gray-500 mt-1">
+
                       温度: {{ MODEL_CONFIGS[modelName].defaultTemperature }}
+
                     </div>
+
                   </div>
                 </label>
+
+
               </div>
             </div>
           </div>
@@ -101,6 +223,7 @@
               </div>
             </div>
             
+
             <!-- 未选择模型提示 -->
             <div v-else class="p-3 bg-gray-50 rounded-lg">
               <div class="flex items-center">
@@ -112,10 +235,11 @@
         </div>
       </div>
 
+
       <!-- 右侧结果区域 -->
       <div class="w-1/2 flex flex-col">
         <div class="p-6 border-b bg-white">
-          <h2 class="text-lg font-semibold mb-2 text-gray-800">优化结果</h2>
+          <h2 class="text-base font-semibold mb-2 text-gray-800">优化结果</h2>
           <p class="text-sm text-gray-600">AI为您生成的优化版本，点击可复制使用</p>
         </div>
         
@@ -223,16 +347,24 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
+
 import { ref, computed, onMounted, reactive } from 'vue'
+
+
+
 
 import { useRouter } from 'vue-router'
 import { adjustWindowSize, WINDOW_PRESETS } from '../utils/windowManager'
+
 import { multiModelService } from '../services/multi-model-service'
 import { apiKeyService } from '../services/api-key-service'
 import { historyService } from '../services/history-service'
 import { toast } from '../services/toast'
+
 import type { ModelName, HomePageState, OptimizationRecord, ModelResult } from '../types/prompt-optimizer'
+
 import { MODEL_CONFIGS, OptimizationStatus } from '../types/prompt-optimizer'
 
 const router = useRouter()
@@ -370,12 +502,88 @@ onMounted(() => {
 
 <style scoped>
 .btn-primary {
+
+
+
+
+
+
+
+
+
+
+
+
   @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
+
+
+
+
+
+
+
+
+
 .btn-secondary {
+
+
+
+
+
+
+
+
+
   @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center;
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
 
 .prompt-optimizer {
   height: calc(100vh - 2rem);
