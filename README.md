@@ -10,7 +10,21 @@
 
 ## 中文
 
-一个专为Windows桌面环境设计的AI编程助手软件，基于Tauri框架构建，提供实时进程监控、多模型API并发提示词优化和智能编程辅助功能。
+一个跨平台的AI编程助手软件，支持Windows桌面和Android移动端，基于Tauri和Capacitor框架构建，提供实时进程监控、多模型API并发提示词优化、手势识别和智能编程辅助功能。
+
+## 🌟 平台支持
+
+### 🖥️ Windows桌面端
+- **Tauri 2.x框架**: 基于Rust的高性能桌面应用
+- **原生系统集成**: 进程监控、系统托盘、快捷键支持
+- **浮动窗口**: 320x240px可调整大小的浮动窗口
+- **硬件加速**: 支持GPU加速的手势识别和3D渲染
+
+### 📱 Android移动端
+- **Capacitor框架**: 跨平台移动应用开发
+- **Material Design**: 遵循Google Material Design设计规范
+- **原生功能**: 摄像头、存储、分享、通知等原生API
+- **离线优先**: 本地数据存储，支持离线使用
 
 ## 🚀 功能特性
 
@@ -23,6 +37,8 @@
 - **AI虚拟形象**: 使用imgs目录下的AI状态图片，实现陪伴式交互
 - **手势识别**: 基于MediaPipe的21个关键点检测，支持10种静态手势识别
 - **实时视觉交互**: 通过摄像头实现手势控制和交互功能
+- **跨平台支持**: 同时支持Windows桌面应用和Android移动应用
+- **原生性能**: 桌面端使用Rust+Tauri，移动端使用Capacitor原生集成
 
 ### 🎨 界面设计
 - **主界面**: 320x240px浮动窗口，显示AI虚拟形象和状态指示器
@@ -31,7 +47,8 @@
 - **历史记录**: 操作日志查看、提示词优化历史、统计数据
 - **设置页面**: 多模型API配置、系统设置、快捷键配置
 - **手势识别页面**: 实时摄像头预览、手势检测、配置管理、历史记录
-- **响应式字体设计**: 使用Tailwind CSS的clamp()函数实现字体大小自适应，在不同屏幕尺寸下提供最佳阅读体验
+- **移动端界面**: Material Design风格的移动端UI，支持底部导航和原生体验
+- **响应式设计**: 桌面端和移动端都采用响应式设计，适配不同屏幕尺寸
 
 ### ⚡ 新增特性
 - **并发优化**: 同时使用多个AI模型优化提示词，提高效率和质量
@@ -44,6 +61,8 @@
 - **手势平滑**: 内置手势平滑算法，减少检测抖动，提高识别准确性
 - **3D可视化**: 集成Three.js实现手部关键点3D可视化
 - **消息通知**: 集成Sonner提供优雅的消息提示体验
+- **移动端原生功能**: 支持摄像头、剪贴板、分享、触觉反馈等原生功能
+- **离线支持**: 移动端支持离线使用和数据同步
 
 ## 🛠️ 技术架构
 
@@ -392,7 +411,21 @@ MIT License - 详见 LICENSE 文件
 
 ## English
 
-A professional AI programming assistant designed for Windows desktop environment, built with Tauri framework, providing real-time process monitoring, multi-model API concurrent prompt optimization, and intelligent programming assistance.
+A cross-platform AI programming assistant supporting both Windows desktop and Android mobile platforms, built with Tauri and Capacitor frameworks, providing real-time process monitoring, multi-model API concurrent prompt optimization, gesture recognition, and intelligent programming assistance.
+
+## 🌟 Platform Support
+
+### 🖥️ Windows Desktop
+- **Tauri 2.x Framework**: High-performance desktop app based on Rust
+- **Native System Integration**: Process monitoring, system tray, hotkey support
+- **Floating Window**: Resizable 320x240px floating window
+- **Hardware Acceleration**: GPU-accelerated gesture recognition and 3D rendering
+
+### 📱 Android Mobile
+- **Capacitor Framework**: Cross-platform mobile app development
+- **Material Design**: Following Google Material Design guidelines
+- **Native Features**: Camera, storage, sharing, notifications and other native APIs
+- **Offline First**: Local data storage with offline support
 
 ## 🚀 Features
 
@@ -405,6 +438,8 @@ A professional AI programming assistant designed for Windows desktop environment
 - **AI Avatar**: Interactive AI companion using status images from imgs directory
 - **Gesture Recognition**: MediaPipe-based 21-point hand landmark detection supporting 10 static gestures
 - **Real-time Visual Interaction**: Camera-based gesture control and interaction features
+- **Cross-platform Support**: Supports both Windows desktop and Android mobile applications
+- **Native Performance**: Desktop uses Rust+Tauri, mobile uses Capacitor native integration
 
 ### 🎨 Interface Design
 - **Main Interface**: 320x240px floating window with AI avatar and status indicators
@@ -424,6 +459,8 @@ A professional AI programming assistant designed for Windows desktop environment
 - **Gesture Smoothing**: Built-in gesture smoothing algorithms to reduce detection jitter
 - **3D Visualization**: Three.js integration for 3D hand landmark visualization
 - **Elegant Notifications**: Sonner integration for beautiful message notifications
+- **Mobile Native Features**: Support for camera, clipboard, sharing, haptic feedback and other native features
+- **Offline Support**: Mobile app supports offline usage and data synchronization
 
 ## 🛠️ Technical Architecture
 
